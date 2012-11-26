@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="/Users/brady/dev/eclipse-workspace/libs/core.jar" sourcepath="/Users/brady/dev/processing-1.5.1-src/processing-read-only/processing/core/src/processing/core">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/Users/brady/dev/processing-1.5.1-src/processing-read-only/build/javadoc/core/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
