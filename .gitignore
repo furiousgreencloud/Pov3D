@@ -1,0 +1,19 @@
+*~
+testgpio
+testreadpin
+*.o
+*.log
+*.status
+.debs
+Makefile
+*.la
+*.lo
+.libs
+# MAC STUFF
+.DS_Store
+./src/DS_Store
+.project
+autom4te.cache/
+libtool
+m4/
+.cproject
