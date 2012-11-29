@@ -13,6 +13,7 @@ public class Line extends POVObject {
 	ArrayList<YPoint> pointCloud;
 
 	public Line(PVector a, PVector b) {
+		this.pointCloud = new ArrayList<YPoint>();
 		this.a = POV.project(a);
 		this.b = POV.project(b);
 		strokeLineInto(pointCloud, a, b);
