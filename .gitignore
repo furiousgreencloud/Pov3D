@@ -10,7 +10,6 @@ Makefile
 *.lo
 .libs
 *.class
-# MAC STUFF
 .DS_Store
 ./src/DS_Store
 .project
