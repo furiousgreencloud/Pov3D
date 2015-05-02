@@ -18,6 +18,13 @@ public class POVObject extends ProcessingObject {
 		POV = display;
 	}
 
+	/**
+	 * Populates a point cloud 'destination' with all the points from 'start' to 'end'
+	 * 
+	 * @param destination
+	 * @param start
+	 * @param end
+	 */
 	protected void strokeLineInto(List<YPoint> destination, PVector start,
 			PVector end) {
 		/*
@@ -25,6 +32,9 @@ public class POVObject extends ProcessingObject {
 		 * 
 		 * p = (0->1)*(b-a) + a
 		 */
+		if (start.equals(end)) {
+			destination.add(new YPoint(start));
+		}
 
 		PVector delta = PVector.sub(end, start);
 		for (float interp = 0f; interp <= 1; interp += 1f / 50f) {

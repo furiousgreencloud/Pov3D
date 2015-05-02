@@ -10,16 +10,17 @@ import Pov3D.util.POVObject;
 public class Line extends POVObject {
 	public PVector a, b;
 
-	ArrayList<YPoint> pointCloud;
-
-	public Line(PVector a, PVector b) {
-		this.pointCloud = new ArrayList<YPoint>();
-		this.a = POV.project(a);
-		this.b = POV.project(b);
-		strokeLineInto(pointCloud, a, b);
+	
+	public Line(PVector a, PVector b) {		
+		this.a = a;
+		this.b = b;		
 	}
 
 	public void draw() {
+		ArrayList<YPoint> pointCloud  = new ArrayList<YPoint>(100);
+		PVector l1 = POV.project(a);
+		PVector l2 = POV.project(b);
+		strokeLineInto(pointCloud, l1, l2);
 		Iterator<YPoint> i = pointCloud.iterator();
 		while (i.hasNext()) {
 			POV.dot(i.next());

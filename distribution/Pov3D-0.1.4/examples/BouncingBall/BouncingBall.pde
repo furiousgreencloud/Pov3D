@@ -4,13 +4,7 @@
 
 // CONSTANTS
 
-int SCREEN_WIDTH = 640;
-int SCREEN_HEIGHT = 360;
-int FRAME_RATE = 25;
-int ANIMATE_INTERVAL_MS = 80;
-int FLAKE_FALL_PER_SEC = 20;
-int INT_MAX = 2147483647;
-int INT_MIN = -2147483648;
+int FRAME_RATE = 12;
 
 String BEAGLE_IP = "10.10.1.99"; // Wifi
 //String BEAGLE_IP = "192.168.7.2"; // Serial
@@ -34,24 +28,10 @@ PVector velocity;
 int maxSpeed = 5;
 int size = 12; // 7 - 12
 
-
-float radtodeg(float r) {
-  return Util.linearmap(r, 0f, PI, 0f, 180f);
-}
-
-int TimeDiff(int start, int end) {
-  if (end >= start) {
-    return end - start;
-  } 
-  else {
-    return INT_MAX - start + end;
-  }
-}
-
 // Here we go !
 
 void setup() {
-  size(SCREEN_WIDTH, SCREEN_HEIGHT, P3D);
+  size(640, 480, P3D);
   fill(204);
   frameRate(FRAME_RATE); // fps
 
@@ -59,7 +39,8 @@ void setup() {
   Pov3DLibrary lib = new Pov3DLibrary(this); 
   ProcessingObject.setPApplet(this);
   g_display = new POVDisplay(BEAGLE_IP, 90);
-  POVObject.setDisplay(g_display);
+  POVObject.setDisplay(g_display); // sets the display for all the POV Objects 
+                                   // like sphere and line
 
   center = new PVector();
   velocity = new PVector(
@@ -97,6 +78,8 @@ void Animate() {
 
 
   /*
+   Attempt at Realy ball and cylinder interaction
+  
    PPolar ball_polar = Util.cartopol(center);
    
    if ( ball_polar.amplitude >= POVDisplay.MAX_AMPITUDE) { // hit wall
@@ -143,23 +126,17 @@ void Animate() {
 
 
 void draw() {  
-  boolean needExport = false;
   lights();
   background(0);
 
-  float cameraTopBotAngle = (float)Util.linearmap(mouseY, 0, SCREEN_HEIGHT, -Math.PI/4, Math.PI/4);
-  camera(Util.linearmap(mouseX, 0, SCREEN_WIDTH, 150, -150), // eye X
+  float cameraTopBotAngle = (float)Util.linearmap(mouseY, 0, height, -Math.PI/4, Math.PI/4);
+  camera(Util.linearmap(mouseX, 0, width, 150, -150), // eye X
     sin(cameraTopBotAngle)*220f, // eye Y
     cos(cameraTopBotAngle)*220, // eye Z
     0.0f, 0.0f, 0.0f, // centerX, centerY, centerZ
     0.0f, 1.0f, 0.0f); // upX, upY, upZ
 
-  int now = millis();
-  if (TimeDiff(g_last, now) >= ANIMATE_INTERVAL_MS) {
-    Animate();
-    needExport = true;
-    g_last = now;
-  }
+  Animate();
 
   g_display.clear();
 
@@ -178,12 +155,12 @@ void draw() {
   //g_display.dot(0,50,50); // Low Front Reference Pixel
   //g_display.dot(-50,50,0); // Low Left ( on X plane) Reference Pixel
   //g_display.dot(0,50,-50); // Low Far Back ( on Z plane) Reference Pixel
-  g_display.dot(50,50,0); // Low Right ( on X plane) Reference Pixel
+  //g_display.dot(50,50,0); // Low Right ( on X plane) Reference Pixel
 
   // Draw Snow Flakes
   stroke(255);
   sphere.draw();
 
-  if (needExport) g_display.export(); // Send to POV Display
+  g_display.export(); // Send to POV Display
 }
 

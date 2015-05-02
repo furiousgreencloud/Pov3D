@@ -22,6 +22,8 @@ public class Poly extends POVObject {
 	}
 
 	public void close() {
+		// no need to use 'Project' because the first point
+		// has been projected all ready.
 		outline.add(outline.get(0));
 		updatePointCloud();
 	}
@@ -31,18 +33,14 @@ public class Poly extends POVObject {
 	}
 
 	private void updatePointCloud() {
+		pointCloud.clear();
 		Iterator<PVector> i = outline.iterator();
 
 		if (outline.size() > 1) {
 			PVector start = i.next();
 			while (i.hasNext()) {
 				PVector end = i.next();
-
-				PVector delta = PVector.sub(end, start);
-				for (float interp = 0f; interp <= 1; interp += 1f / 50f) {
-					PVector p = PVector.add(start, PVector.mult(delta, interp));
-					pointCloud.add(new YPoint(p));
-				}
+				strokeLineInto(pointCloud,start,end);
 				start = end;
 			}
 		}

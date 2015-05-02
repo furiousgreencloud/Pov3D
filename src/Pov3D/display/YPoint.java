@@ -11,7 +11,7 @@ public class YPoint extends ProcessingObject {
 	public int m_slice, m_slice_x, m_slice_y;
 	public int theta;
 	
-	boolean m_clipped; // Don't Draw it's out side display
+	public boolean m_clipped; // Don't Draw it's out side display
 
 	@Override public String toString() {
 		    StringBuilder result = new StringBuilder();

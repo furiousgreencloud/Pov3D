@@ -1,7 +1,7 @@
 package Pov3D.display;
 
-import java.util.ArrayList;
-import java.util.Iterator;
+//import java.util.Iterator;
+import java.util.Stack;
 
 import processing.core.*;
 import Pov3D.util.*;
@@ -18,20 +18,23 @@ public class POVDisplay extends Pov3D.util.ProcessingObject {
 	public static int ORANGE =  0xEEB400;
 	
 	private Slice[] m_slices;
-	public int m_exportCount = 0;
+	
+	public int m_pointCountInDisplay = 0; // The number of non clipped points that the display will show
+	//public int m_exportCount = 0;
 	
 	public String m_deviceIP; // = "127.0.0.1";
 	
 	private UDP m_udp = null;
 	
 	private PMatrix3D m_matrix = null;
-	private ArrayList<PMatrix3D> m_matrixStack;
+	private Stack<PMatrix3D> m_matrixStack;
 	
 	public POVDisplay(String deviceIP) {
 		super();
+		
 		m_deviceIP = deviceIP;
 		m_matrix = new PMatrix3D();
-		m_matrixStack = new ArrayList<PMatrix3D>(); // top/most recent matrix is the front i.e. at index 0
+		m_matrixStack = new Stack<PMatrix3D>(); // top/most recent matrix is the front i.e. at index 0
 		m_matrixStack.add(m_matrix);
 		PApplet.println("Will Look for POV Display at: " 
 					+ deviceIP 
@@ -56,6 +59,12 @@ public class POVDisplay extends Pov3D.util.ProcessingObject {
 		assert (m_slices != null);
 		for (int i = 0; i < Util.MAX_SLICES; i++)
 			m_slices[i].clear();
+		/*
+		m_matrix = new PMatrix3D();
+		m_matrixStack.clear();
+		m_matrixStack.add(m_matrix);
+		*/
+		m_pointCountInDisplay = 0;
 	}
 
 	/**
@@ -95,7 +104,7 @@ public class POVDisplay extends Pov3D.util.ProcessingObject {
 		buffer[bufferIndex++] = 0; // null terminate
 		assert(bufferIndex == byteCount);
 		m_udp.send(buffer, m_deviceIP, Util.PORT_TX);
-		m_exportCount++;
+		//m_exportCount++;
 	}
 
 	/**
@@ -148,17 +157,39 @@ public class POVDisplay extends Pov3D.util.ProcessingObject {
 	 * @param y pos
 	 * @param z pos
 	 */
-	public void dot(float x, float y, float z) {
-		dot(new PVector(x, y, z));
+	public boolean dot(float x, float y, float z) {
+		return dot(new PVector(x, y, z));
 	}
 
 	/**
-	 * Light point at point p
-	 * @param yp
+	 * Convenience method to light a point
+	 * @param x pos
+	 * @param y pos
+	 * @param z pos
+	 * @param c Color value as int
 	 */
-	public void dot(PVector p) {
+	public boolean dot(float x, float y, float z, int c) {
+		return dot(new PVector(x, y, z),c);
+	}
+
+	
+	/**
+	 * Light point at point p
+	 * @param p a PVector point
+	 */
+	public boolean dot(PVector p) {
 		YPoint yp = new YPoint(project(p));
-		dot(yp);
+		return dot(yp);
+	}
+	
+	public boolean dot(PVector p, int c) {
+		YPoint yp = new YPoint(project(p));
+		return dot(yp, c);
+	}
+	
+	public void sphere(PVector pos, int size) {
+		Pov3D.shape.Sphere s = new Pov3D.shape.Sphere(pos,size);
+		s.draw();
 	}
 	
 	/**
@@ -171,9 +202,9 @@ public class POVDisplay extends Pov3D.util.ProcessingObject {
 	public PVector project(PVector p) {
 		PVector finalPos = new PVector();
 		
-		Iterator<PMatrix3D> i = m_matrixStack.iterator();
-		while(i.hasNext()) {
-			i.next().mult(p,finalPos);
+		int index = m_matrixStack.size() - 1;
+		while(index >= 0) {
+			m_matrixStack.get(index--).mult(p,finalPos);
 			p = finalPos;
 		}
 		
@@ -183,30 +214,51 @@ public class POVDisplay extends Pov3D.util.ProcessingObject {
 	/**
 	 * Light a Dot on the display, a YPoint unlike a PVector is not translated and rotated on the matrix stack.
 	 * @param yp direct point to light
+	 * 
+	 * returns true if the point is currently in the display cylinder, i.e. was not cliped
 	 */
-	public void dot(YPoint yp) {
+	public boolean dot(YPoint yp, int c) {
 		writePoint(yp, true);
-		if (yp.m_clipped) 
-			pApplet.stroke(ORANGE);
-		else
-			pApplet.stroke(255);
+		pApplet.stroke(c);
+		if (!yp.m_clipped) { 
+			m_pointCountInDisplay++;
+		}
 		pApplet.point(yp.m_x,yp.m_y,yp.m_z);
+		return !yp.m_clipped;
+	}
+	
+	public boolean dot(YPoint yp) {
+		writePoint(yp, true);
+		if (yp.m_clipped) { 
+			pApplet.stroke(ORANGE);
+		} else {
+			pApplet.stroke(255);
+			m_pointCountInDisplay++;
+		}
+		pApplet.point(yp.m_x,yp.m_y,yp.m_z);
+		return !yp.m_clipped;
 	}
 
 	public void pushMatrix() {
 		PMatrix3D m = new PMatrix3D();
-		m_matrixStack.add(0, m);
+		m_matrixStack.push(m);
 		m_matrix = m;
 	}
 	
 	public void popMatrix() {
-		int stackSize = m_matrixStack.size();
-		if (stackSize >= 2) {
-			m_matrixStack.remove(0);
-			m_matrix = m_matrixStack.get(0);
+		if (m_matrixStack.size() >= 2) {
+			m_matrixStack.pop();
+			m_matrix = m_matrixStack.peek();
 		}
 		assert(m_matrixStack.size() > 0);
 		assert(m_matrix != null);
+	}
+	
+	public void resetMatrix() {
+		m_matrix = new PMatrix3D();
+		m_matrixStack = new Stack<PMatrix3D>(); // top/most recent matrix is the front i.e. at index 0
+		m_matrixStack.add(m_matrix);
+		pApplet.resetMatrix();
 	}
 	
 	/**
@@ -239,5 +291,12 @@ public class POVDisplay extends Pov3D.util.ProcessingObject {
 	
 	public void translate(float tx, float ty, float tz) {
 		m_matrix.translate(tx, ty, tz);
+	}
+	
+	public void scale(float s) {
+		m_matrix.scale(s);
+	}
+	public void scale(float x, float y, float z) {
+		m_matrix.scale(x,y,z);
 	}
 }
