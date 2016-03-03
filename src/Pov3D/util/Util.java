@@ -5,9 +5,16 @@ import java.awt.Point;
 import processing.core.PApplet;
 import processing.core.PVector;
 
+/**
+ * Utility Functions and Constants
+ * 
+ * @author Brady Marks (furiousgreencloud@gmail.com)
+ *
+ */
+
 public class Util extends ProcessingObject{
 
-	// GLOBALS
+	// CONSTANTs
 	
 	public static int ROWS = 50;
 	public static int COLS = 50;
@@ -52,8 +59,6 @@ public class Util extends ProcessingObject{
 				linearmap(p.z,loIn.z,hiIn.z,lowOut.z,hiOut.z)
 				);
 	}
-	
-	
 	
 	public static float hypot(float x, float y) {
 		return PApplet.sqrt(x * x + y * y);

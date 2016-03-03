@@ -8,8 +8,8 @@ import Pov3D.display.YPoint;
 import Pov3D.util.POVObject;
 
 public class Line extends POVObject {
+	
 	public PVector a, b;
-
 	
 	public Line(PVector a, PVector b) {		
 		this.a = a;

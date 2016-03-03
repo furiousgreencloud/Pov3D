@@ -1,5 +1,12 @@
 package Pov3D.util;
 
+/**
+ * Like a 3D Vector by with the X & Z in polar coordinates.
+ * 
+ * @author Brady Marks (furiousgreencloud@gmail.com)
+ *
+ */
+
 public class PPolar {
 	public float amplitude, angle, y;
 	public PPolar(float amplitude, float angle, float y) {

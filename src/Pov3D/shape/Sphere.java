@@ -74,6 +74,10 @@ public class Sphere extends POVObject {
 	private void update() {
 		points.clear();
 
+		
+		/* TODO: Optimisation
+		 * this is very inefficient especially for the case of an OUTLINED sphere
+		 */
 		for (int x = (int) (center.x - size); x <= center.x + size; x++) {
 			for (int y = (int) (center.y - size); y <= center.y + size; y++) {
 				for (int z = (int) (center.z - size); z <= center.z + size; z++) {
